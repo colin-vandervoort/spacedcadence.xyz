@@ -1,0 +1,19 @@
+---
+import SidebarNav from './SidebarNav.astro';
+
+export interface Props {
+	headings: Array<Record<string, any>>
+}
+
+const { headings } = Astro.props
+const navItems = headings.map(h => {
+	return {
+		text: h.text,
+		href: `#${ h.slug }`
+	}
+})
+---
+<SidebarNav
+	title="On this page"
+	items={ navItems }
+/>

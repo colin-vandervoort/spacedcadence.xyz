@@ -1,0 +1,26 @@
+---
+const primaryNavItems = [
+	{
+		text: 'Home',
+		href: '/'
+	},
+	{
+		text: 'Archive',
+		href: '/archive/1/'
+	},
+]
+---
+<div class="page-header">
+	<header class="grid grid-rows-header grid-cols-header">
+		<nav class="flex flex-wrap gap-x-2 my-1">
+			{ primaryNavItems.map(e => (
+				<a
+					href={ e.href }
+					class="py-1"
+				>{ e.text }</a>
+			) ) }
+		</nav>
+		<slot name="buttons"></slot>
+	</header>
+	<span class="_gradient-hr" aria-hidden="true"></span>
+</div>

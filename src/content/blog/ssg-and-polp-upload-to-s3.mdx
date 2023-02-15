@@ -1,0 +1,168 @@
+---
+title: 'PoLP S3 Upload'
+description: 'Using GitHub Actions, AWS IAM, and OpenID Connect to securely upload files to AWS S3'
+tags: [
+	'github-actions',
+	'aws-iam',
+	'aws-s3',
+	'oidc',
+	'terraform'
+]
+pubDate: '2022-05-22'
+---
+
+Static site generation (SSG) is a popular method for publishing content on the web. This approach involves rendering HTML files before they are requested, which can simplify the process of securing a website. At the time of writing, this website is statically generated, and I'd like to share how I secured my site upload process.
+
+First off, what is at stake here? Not too much, compared to most websites. I am currently the owner of a website that only sees about ten users over the course of a week, without any sensitive data stored in a backend, nor ability for an attacker to move laterally.
+
+That said, there is still some public damage that could be done. The HTML files for the website are served from a S3 bucket in Amazon. If the bucket was compromised, the website could be taken down and my precious viewers would be deprived of charming technical content. I think they would manage though.
+
+Perhaps worse than that, an attacker could replace my HTML files with alternate files including graphic content like gore. That wouldn't be tasteful and could ruin the days of my viewers.
+
+So, that unlikely event aside, I think I should be able to prevent any harm to the public!
+
+Currently I use a GitHub Actions workflow to transform my Markdown files into HTML and upload them to AWS S3, which requires authorization. AWS kindly maintains a GitHub Action for configuring AWS credentials in other GitHub Actions [here](https://github.com/aws-actions/configure-aws-credentials). They encourage users to avoid passing their credentials to a CI runner. The superior approach involves utilizing OpenID Connect to authorize on the basis of the repository identity, but this requires some additional setup.
+
+Initially I used [this](https://github.com/unfunco/terraform-aws-oidc-github) Terraform module to do the relevant AWS IAM setup, but unfortunately with it I was forced to attach an admin policy to my CI runner's actions. In the unlikely event that my CI runner was hijacked, it could rack up a major cloud bill, which would make me sad. Ultimately I ended up customizing the IAM permissions to limit the CI runner to the minimum privileges it needed, in the spirit of the principle of least privilege (PoLP).
+
+Here is the relevant code for my website. `secrets.AWS_ROLE_TO_ASSUME` is the ARN of the `weblog-deploy-github-action` role. You can get the ARN from Terraform or by logging into the AWS management console.
+
+## action.yml
+```yaml
+name: 'Zola to S3 Bucket'
+description: 'Build and upload a Zola site to a S3 bucket'
+author: 'Colin VanDervoort'
+inputs:
+  aws-role-to-assume:
+    required: true
+    description: "ARN of the IAM role which the runner should assume"
+  s3-bucket:
+    required: true
+    description: "The S3 bucket slug"
+  zola-project-path:
+    required: true
+    description: "The path to the site's zola files"
+runs:
+  using: 'composite'
+  steps:
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-region: us-west-1
+        role-to-assume: ${{ inputs.aws-role-to-assume }}
+        role-session-name: StaticPublish
+    - name: 'Build site with zola'
+      shell: bash
+      working-directory: ${{ inputs.zola-project-path }}
+      run: |
+        docker run -d \
+          --user "$(id -u):$(id -g)" \
+          --mount type=bind,source=${GITHUB_WORKSPACE}/${ZOLA_PROJECT_PATH},target=/app \
+          --workdir /app \
+          ghcr.io/getzola/zola:v0.15.1 \
+          build
+      env:
+        ZOLA_PROJECT_PATH: ${{ inputs.zola-project-path }}
+    - name: Upload app to AWS S3
+      shell: bash
+      working-directory: ${{ inputs.zola-project-path }}
+      run: aws s3 sync public s3://$S3_BUCKET --delete
+      env:
+        S3_BUCKET: ${{ inputs.s3-bucket }}
+
+```
+## deploy-to-s3.yml
+
+```yaml
+name: Deploy app
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build-and-upload-to-s3:
+    name: Build and upload public files to AWS S3
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout actions
+        uses: actions/checkout@v3.0.0
+      - name: Deploy files
+        uses: ./.github/actions/zola-to-s3
+        with:
+          aws-role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          s3-bucket: colin-vandervoort-blog-static
+          zola-project-path: .
+
+```
+
+## Terraform config
+```hcl
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    effect  = "Allow"
+
+    condition {
+      test     = "StringLike"
+      values   = ["repo:${local.github_user}/${local.github_repo}:*"]
+      variable = "token.actions.githubusercontent.com:sub"
+    }
+
+    principals {
+      identifiers = [aws_iam_openid_connect_provider.oidc_provider.arn]
+      type        = "Federated"
+    }
+  }
+
+  version = "2012-10-17"
+}
+
+data "aws_iam_policy_document" "sync_s3" {
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:DeleteObject",
+    ]
+
+    resources = [
+      aws_s3_bucket.blog_static_files.arn,
+      "${aws_s3_bucket.blog_static_files.arn}/*",
+    ]
+  }
+}
+
+resource "aws_iam_role" "github" {
+  name = "weblog-deploy-github-action"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_iam_policy" "sync_s3" {
+  policy = data.aws_iam_policy_document.sync_s3.json
+}
+
+resource "aws_iam_role_policy_attachment" "sync_s3" {
+  policy_arn = aws_iam_policy.sync_s3.arn
+  role       = aws_iam_role.github.id
+}
+
+resource "aws_iam_openid_connect_provider" "oidc_provider" {
+  url = "https://token.actions.githubusercontent.com"
+  client_id_list = [
+    "https://github.com/${local.github_user}",
+    "sts.amazonaws.com"
+  ]
+  thumbprint_list = [local.github_thumbprint]
+}
+
+```
+
+## Resources
+- https://github.com/aws-actions/configure-aws-credentials
+- https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect
+- https://www.youtube.com/watch?v=t18YB3xDfXI
+- https://github.com/unfunco/terraform-aws-oidc-github
+- https://dev.to/jameswallis/using-github-composite-actions-to-make-your-workflows-smaller-and-more-reusable-476l

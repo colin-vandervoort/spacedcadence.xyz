@@ -1,0 +1,77 @@
+---
+import { CollectionEntry, getCollection } from "astro:content";
+import { SITE_TITLE } from "../config"
+
+export interface TagInfo {
+	slug: string;
+	count: number;
+}
+
+export interface NavItem {
+	text: string;
+	href: string;
+}
+
+export async function getBlogPosts(): Promise<Array<CollectionEntry<'blog'>>> {
+	const allPosts = await getCollection('blog')
+	const filtered = allPosts
+		.filter(post => {
+			if (import.meta.env.PROD && post.data.draft) {
+				return false
+			}
+			return true
+		})
+		.sort((a, b) => new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf())
+
+	return filtered
+}
+
+export async function getAllTags(): Promise<Array<TagInfo>> {
+	const posts = await getBlogPosts()
+	const tagMap = new Map()
+
+	for (const p of posts) {
+		for (const tagSlug of p.data.tags) {
+			tagMap.set(tagSlug, (tagMap.get(tagSlug) + 1) || 1)
+		}
+	}
+
+	const tagInfoArr: Array<TagInfo> = []
+	for (const [slug, count] of tagMap.entries()) {
+		tagInfoArr.push({slug, count})
+	}
+	tagInfoArr.sort((a, b) => {
+		if (a.slug < b.slug) { return -1; }
+		if (a.slug > b.slug) { return 1; }
+		return 0;
+	})
+	tagInfoArr.sort((a, b) => b.count - a.count )
+
+	return tagInfoArr
+}
+
+export async function getRelatedBlogPosts(postId: string, tagArr: Array<string>): Promise<Array<CollectionEntry<'blog'>>> {
+	const targetTagSet = new Set(tagArr)
+
+	const posts = await getBlogPosts()
+	const filtered = posts
+		.filter(p => {
+			if (p.id === postId) {
+				return false
+			}
+			for (const tag of p.data.tags) {
+				if (targetTagSet.has(tag)) {
+					return true
+				}
+			}
+			return false
+		})
+	filtered.sort((a, b) => {
+		if (a.slug < b.slug) { return -1; }
+		if (a.slug > b.slug) { return 1; }
+		return 0;
+	})
+
+	return filtered
+}
+---

@@ -1,0 +1,19 @@
+---
+export interface Props {
+	title: string
+	items: Array<any>
+}
+
+const { title, items } = Astro.props
+---
+<nav class="grid grid-">
+	<h2 class="mt-0 mb-2 font-heading font-medium text-lg">{ title }</h2>
+	<ul class="flex flex-col flex-nowrap py-2 overflow-y-auto list-diamond">
+		{ items.map(e => (
+			<li class="py-1">
+				<a href={ e.href }>{ e.text }</a>
+				{ ( e.extra && <span>{ e.extra }</span>) }
+			</li>
+		) ) }
+	</ul>
+</nav>

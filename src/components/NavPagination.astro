@@ -1,0 +1,77 @@
+---
+import type { Page } from 'astro'
+import _ from 'lodash'
+
+export interface Props {
+	page: Page;
+	archiveBase: string;
+}
+
+const { page, archiveBase } = Astro.props
+
+const windowStartIdx = Math.max(1, page.currentPage - 2)
+const windowEndIdx = Math.min(page.lastPage, page.currentPage + 2)
+const numericLinkIndices = _.range(windowStartIdx, windowEndIdx + 1)
+---
+<nav class="nav-pagination">
+	<ul>
+		<li>
+			{ page.url.prev
+				? <a href={ page.url.prev }>Previous</a>
+				: <a role="link" aria-disabled="true">Previous</a>
+			}
+		</li>
+		{ numericLinkIndices.map(i => (
+			<li>
+				<a
+					href={ `${ archiveBase }/${ i }/` }
+					aria-current={ (i === page.currentPage) ? 'page' : 'false' }
+				>{ i }</a>
+			</li>
+		) ) }
+		{ (windowEndIdx !== page.lastPage) && (
+			<>
+				<li aria-hidden="true"><span>&hellip;</span></li>
+				<li>
+					<a href={ `${ archiveBase }/${ page.lastPage }/` }>{ page.lastPage }</a>
+				</li>
+			</>
+		) }
+		<li>
+			{ page.url.next
+				? <a href={ page.url.next }>Next</a>
+				: <a role="link" aria-disabled="true">Next</a>
+			}
+		</li>
+	</ul>
+</nav>
+<style>
+	nav {
+		margin-top: 3rem;
+	}
+	ul {
+		padding-inline: 0;
+		display: flex;
+		flex-flow: row wrap;
+		gap: 1rem;
+		list-style: none;
+	}
+	li:first-child {
+		padding-left: 0;
+	}
+	li:first-child a {
+		padding-left: 0;
+	}
+	a {
+		padding: 0.3rem;
+	}
+
+	a[aria-current="page"] {
+		color: var(--clr-contrast);
+		border-bottom: 2px solid var(--clr-link);
+		border-radius: 0;
+	}
+	a[aria-disabled="true"] {
+		color: var(--clr-contrast-med);
+	}
+</style>

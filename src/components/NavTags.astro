@@ -1,0 +1,17 @@
+---
+import { getAllTags } from '../pages/_util.astro'
+import SidebarNav from './SidebarNav.astro';
+
+const tagInfoArr = await getAllTags();
+const navItems = tagInfoArr.map(tagInfo => {
+	return {
+		text: tagInfo.slug,
+		href: `/tag/${ tagInfo.slug }/1/`,
+		extra: `(${ tagInfo.count })`
+	}
+})
+---
+<SidebarNav
+	title="Tags"
+	items={ navItems }
+/>

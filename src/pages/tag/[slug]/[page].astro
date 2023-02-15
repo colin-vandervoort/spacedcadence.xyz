@@ -1,0 +1,39 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import BlogPostList from "../../../components/BlogPostList.astro";
+import { getAllTags, getBlogPosts } from "../../_util.astro";
+import NavTags from "../../../components/NavTags.astro";
+import NavPagination from "../../../components/NavPagination.astro";
+import PageHeading from "../../../components/PageHeading.astro";
+
+
+export async function getStaticPaths({ paginate }) {
+	const tagInfoArr = await getAllTags();
+	const blogPosts = await getBlogPosts();
+	return tagInfoArr.map((tagInfo) => {
+		const filteredPosts = blogPosts.filter((post) => post.data.tags.includes(tagInfo.slug));
+		return paginate(filteredPosts, {
+			params: {
+				slug: tagInfo.slug
+			},
+			pageSize: 8,
+		});
+	});
+}
+
+const { slug } = Astro.params
+const { page } = Astro.props
+
+const title = `Posts tagged: ${slug}`;
+---
+
+<BaseLayout title={title}>
+	<PageHeading>{title}</PageHeading>
+	<BlogPostList posts={ page.data } postHeadingLevel={2} />
+	{ ( page.lastPage !== 1 ) && (
+		<NavPagination page={ page } archiveBase={ `/tag/${ slug }` }/>
+	) }
+	<div slot="sidebar-left" class="sidebar-item">
+		<NavTags />
+	</div>
+</BaseLayout>

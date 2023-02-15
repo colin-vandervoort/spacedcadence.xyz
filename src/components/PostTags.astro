@@ -1,0 +1,23 @@
+---
+import { U_DIAMOND } from '../config';
+
+export interface Props {
+	tags: Array<string>
+}
+
+const { tags } = Astro.props
+---
+<div class="flex flex-wrap items-center gap-x-1">
+	{ tags
+		.map((tag) => (
+			<a class="text-turq/90" href={`/tag/${ tag }/1/`}>{ tag }</a>
+		) )
+		.reduce((prev, curr) => (
+			<>
+				{ prev }
+				<span class="text-zinc-700" aria-hidden="true">{ U_DIAMOND }</span>
+				{ curr }
+			</>
+		) )
+	}
+</div>

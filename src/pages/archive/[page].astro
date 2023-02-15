@@ -1,0 +1,30 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BlogPostList from "../../components/BlogPostList.astro";
+import { getBlogPosts } from "../_util.astro";
+import NavTags from "../../components/NavTags.astro";
+import NavPagination from "../../components/NavPagination.astro";
+import PageHeading from "../../components/PageHeading.astro";
+
+export async function getStaticPaths({ paginate }) {
+	const blogPosts = await getBlogPosts();
+	return paginate(blogPosts, {
+		pageSize: 8,
+	});
+}
+
+const { page } = Astro.props
+
+const title = 'Archive';
+---
+
+<BaseLayout title={title}>
+	<PageHeading>{title}</PageHeading>
+	<BlogPostList posts={page.data} postHeadingLevel={2} />
+	{ (page.lastPage !== 1) && (
+		<NavPagination page={ page } archiveBase={ '/archive' }/>
+	) }
+	<div slot="sidebar-left" class="sidebar-item">
+		<NavTags />
+	</div>
+</BaseLayout>

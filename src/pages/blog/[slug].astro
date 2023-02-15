@@ -1,0 +1,70 @@
+---
+import { CollectionEntry, getEntryBySlug } from "astro:content";
+
+import NavRelated from "../../components/NavRelated.astro";
+import NavTOC from "../../components/NavTOC.astro";
+import PageHeading from "../../components/PageHeading.astro";
+import PostHeader from "../../components/PostHeader.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+import { getBlogPosts, getRelatedBlogPosts, NavItem } from "../_util.astro";
+
+export async function getStaticPaths() {
+	const blogPosts = await getBlogPosts()
+	return blogPosts.map((p) => {
+		return {
+			params: {
+				slug: p.slug
+			}
+		}
+	})
+}
+
+const { slug } = Astro.params
+
+const entry = await getEntryBySlug('blog', slug as string) as CollectionEntry<'blog'>
+const { Content, headings } = await entry.render()
+
+const relatedNavItems: Array<NavItem> = await getRelatedBlogPosts(entry.id, entry.data.tags)
+	.then(relatedPosts => relatedPosts.map(p => {
+		return {
+			text: p.data.title,
+			href: `/blog/${ p.slug }`
+		}
+	}))
+const filteredHeadings = headings.filter(h => h.depth === 2)
+
+let renderTOC = false
+if (Array.isArray(filteredHeadings) && filteredHeadings.length) {
+	renderTOC = true
+}
+
+if (entry.data.katex) {
+	await import('katex/dist/katex.css')
+}
+
+---
+<BaseLayout
+	title={ entry.data.title }
+	description={ entry.data.description }
+>
+	<article slot="default" class="single">
+		<PostHeader
+			pubDate={ entry.data.pubDate }
+			tags={ entry.data.tags }
+		>
+			<PageHeading slot="heading">{ entry.data.title }</PageHeading>
+		</PostHeader>
+		<Content/>
+	</article>
+	{ relatedNavItems.length && (
+		<aside slot="sidebar-left" class="sidebar-item">
+			<NavRelated relatedNavItems={ relatedNavItems } />
+		</aside>
+	) }
+	{ renderTOC && (
+		<aside slot="sidebar-right" class="sidebar-item">
+			<NavTOC headings={ filteredHeadings } />
+		</aside>
+	) }
+</BaseLayout>

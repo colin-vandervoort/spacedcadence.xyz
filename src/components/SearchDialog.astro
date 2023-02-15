@@ -1,0 +1,60 @@
+---
+import { Icon } from "astro-icon";
+import SearchWidget from "./SearchWidget";
+
+export interface Props {
+	dialogId: string
+}
+
+const { dialogId } = Astro.props
+---
+<div
+	id={ dialogId }
+	class="search-dialog-container"
+	aria-labelledby="your-dialog-title-id"
+	aria-hidden="true"
+>
+	<div
+		class="search-dialog-overlay"
+		data-a11y-dialog-hide
+	></div>
+	<div
+		class="search-dialog-content"
+		role="document"
+	>
+		<button
+			class="close-btn"
+			type="button"
+			data-a11y-dialog-hide
+			aria-label="Close dialog"
+		>&times;</button>
+		<h1 id="your-dialog-title-id">Your dialog title</h1>
+		<SearchWidget client:visible />
+	</div>
+</div>
+<script>
+	import A11yDialog from "a11y-dialog"
+	// import { getLyraDB, search } from '@lyrasearch/plugin-astro/clientside'
+
+	const element = document.getElementById('1conundrum-search')
+	if (element) {
+		const dialog = new A11yDialog(element)
+
+		dialog
+			.on('show', () => (document.documentElement.style.overflowY = 'hidden'))
+			.on('hide', () => (document.documentElement.style.overflowY = ''))
+
+		// const db = await getLyraDB('mydb')
+	} else {
+		// hide dialog show buttons
+		// document.querySelectorAll('[data-a11y-dialog-show]').forEach(e => null)
+	}
+</script>
+
+<style>
+	.close-btn {
+		font-size: var(--font-size-large);
+		margin: calc(-1 * var(--padding-link));
+		padding: var(--padding-link);
+	}
+</style>
