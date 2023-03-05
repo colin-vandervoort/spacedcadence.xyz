@@ -33,16 +33,14 @@ const pageDescription = description ?? SITE_DESCRIPTION
 		>Skip to main content</a>
 		<SiteHeader>
 		</SiteHeader>
-		<div class="content-wrapper">
-			<main id="main-content" class="mb-2">
-				<slot />
-			</main>
-			<SiteFooter>
-				<a href="#" slot="util-links">
-					<span aria-hidden="true">▲&nbsp;</span>Back to top
-				</a>
-			</SiteFooter>
-		</div>
+		<main id="main-content" class="mb-2">
+			<slot />
+		</main>
+		<SiteFooter>
+			<a href="#" slot="util-links">
+				<span aria-hidden="true">▲&nbsp;</span>Back to top
+			</a>
+		</SiteFooter>
 		<div class="sidebar sidebar-left">
 			<div class="sidebar-inner">
 				<slot name="sidebar-left"/>

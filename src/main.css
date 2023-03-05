@@ -43,8 +43,8 @@
 	--inline-spacing: 1.2rem;
 	--outline-width: 0.1rem;
 
-	--skew-x: -10deg;
-	--skew-x-rev: calc(-1 * var(--skew-x));
+	/* --skew-x: -10deg; */
+	/* --skew-x-rev: calc(-1 * var(--skew-x)); */
 }
 
 @layer base {
@@ -68,7 +68,7 @@
 		grid-template-areas:
 			"header"
 			"content"
-			"sidebar-l";
+			"footer";
 		grid-template-rows: auto 1fr auto;
 		column-gap: var(--site-spacing-outer);
 		row-gap: var(--page-row-gap);
@@ -156,7 +156,7 @@
 	}
 
 	._gradient-hr {
-		@apply block h-1 bg-gradient-to-r from-cyan-800 via-zinc-400 to-cyan-800;
+		@apply block h-1 bg-gradient-to-r from-zinc-500 via-zinc-400 to-zinc-300;
 	}
 
 	._nav-skip-link {
@@ -191,6 +191,31 @@
 
 	.single > header {
 		@apply mt-0;
+	}
+
+	.single > h2 {
+		@apply mt-6;
+		@apply mb-4;
+	}
+	.single > h3 {
+		@apply mt-5;
+		@apply mb-4;
+	}
+	.single > h4 {
+		@apply mt-4;
+		@apply mb-4;
+	}
+	.single > h4 {
+		@apply mt-4;
+		@apply mb-4;
+	}
+	.single > h5 {
+		@apply mt-4;
+		@apply mb-4;
+	}
+	.single > h6 {
+		@apply mt-4;
+		@apply mb-4;
 	}
 
 	blockquote {
@@ -238,6 +263,10 @@
 	grid-area: header;
 }
 
+.page-footer {
+	grid-area: footer;
+}
+
 @media (prefers-reduced-motion) {
 	html {
 		scroll-behavior: auto;
@@ -246,10 +275,11 @@
 
 @media screen(md) {
 	body {
-		grid-template-columns: 1fr 3fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
 		grid-template-areas:
 			"header    header"
-			"sidebar-l content";
+			"sidebar-l content"
+			"sidebar-l footer";
 	}
 
 	.sidebar-left {
@@ -259,11 +289,12 @@
 
 @media screen(lg) {
 	body {
-		grid-template-columns: 1fr 4fr 1fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 4fr) minmax(0, 1fr);
 		grid-template-rows: auto 1fr;
 		grid-template-areas:
 			"header    header  header"
-			"sidebar-l content sidebar-r";
+			"sidebar-l content sidebar-r"
+			"sidebar-l footer  sidebar-r";
 	}
 
 	.sidebar-right {
@@ -274,19 +305,18 @@
 @media print {
 	body {
 		background-color: white;
-		padding-block: 0.6in;
-		padding-inline: 0.8in;
+		padding-top: 0.8in;
+		padding-inline: 1.0in;
+		padding-bottom: 1.0in;
+		grid-template-columns: 1fr;
+		grid-template-rows: 1fr;
+		grid-template-areas: "content";
 	}
 
 	._nav-skip-link,
 	.page-header,
-	.page-footer::before,
-	.page-footer nav {
+	body > footer,
+	.sidebar {
 		display: none;
-	}
-
-	.astro-code {
-		white-space: pre-wrap;
-		word-wrap: break-word;
 	}
 }
