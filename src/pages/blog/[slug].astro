@@ -34,11 +34,6 @@ const relatedNavItems: Array<NavItem> = await getRelatedBlogPosts(entry.id, entr
 	}))
 const filteredHeadings = headings.filter(h => h.depth === 2)
 
-let renderTOC = false
-if (Array.isArray(filteredHeadings) && filteredHeadings.length) {
-	renderTOC = true
-}
-
 if (entry.data.katex) {
 	await import('katex/dist/katex.css')
 }
@@ -57,14 +52,14 @@ if (entry.data.katex) {
 		</PostHeader>
 		<Content/>
 	</article>
-	{ relatedNavItems.length && (
+	{ relatedNavItems.length ? (
 		<aside slot="sidebar-left" class="sidebar-item">
 			<NavRelated relatedNavItems={ relatedNavItems } />
 		</aside>
-	) }
-	{ renderTOC && (
+	) : '' }
+	{ filteredHeadings.length ? (
 		<aside slot="sidebar-right" class="sidebar-item">
 			<NavTOC headings={ filteredHeadings } />
 		</aside>
-	) }
+	) : '' }
 </BaseLayout>
