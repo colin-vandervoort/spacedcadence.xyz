@@ -1,0 +1,56 @@
+name: Publish web files to S3
+
+on:
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Static site generation
+        run: npm run build
+        env:
+          SITE_URL: https://test.spacedcadence.xyz
+
+      - name: Store build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-files
+          path: dist
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: StaticSitePublish
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: web-files
+
+      - name: Upload web files to S3
+        run: scripts/sync.sh
+        env:
+          TARGET_ENV: test
+          S3_PATH: s3://colin-personal-dev-site-test-primary/www

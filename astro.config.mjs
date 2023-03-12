@@ -12,13 +12,15 @@ import rehypeKatex from "rehype-katex";
 // https://astro.build/config
 import tailwind from "@astrojs/tailwind";
 
+const siteUrl = process.env.SITE_URL ?? 'https://spacedcadence.xyz'
+
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://spacedcadence.xyz',
+  site: siteUrl,
   integrations: [
-    mdx(), 
-    sitemap(), 
-    react(), 
+    mdx(),
+    sitemap(),
+    react(),
     tailwind({
       config: {
         applyBaseStyles: false,
