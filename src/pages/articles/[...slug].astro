@@ -7,10 +7,10 @@ import PageHeading from "../../components/PageHeading.astro";
 import PostHeader from "../../components/PostHeader.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-import { getBlogPosts, getRelatedBlogPosts, NavItem } from "../_util.astro";
+import { getArticles, getRelatedArticles, NavItem } from "../_util.astro";
 
 export async function getStaticPaths() {
-	const blogPosts = await getBlogPosts()
+	const blogPosts = await getArticles()
 	return blogPosts.map((p) => {
 		return {
 			params: {
@@ -22,14 +22,14 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params
 
-const entry = await getEntryBySlug('blog', slug as string) as CollectionEntry<'blog'>
+const entry = await getEntryBySlug('article', slug as string) as CollectionEntry<'article'>
 const { Content, headings } = await entry.render()
 
-const relatedNavItems: Array<NavItem> = await getRelatedBlogPosts(entry.id, entry.data.tags)
+const relatedNavItems: Array<NavItem> = await getRelatedArticles(entry.id, entry.data.tags)
 	.then(relatedPosts => relatedPosts.map(p => {
 		return {
 			text: p.data.title,
-			href: `/blog/${ p.slug }`
+			href: `/articles/${ p.slug }`
 		}
 	}))
 const filteredHeadings = headings.filter(h => h.depth === 2)

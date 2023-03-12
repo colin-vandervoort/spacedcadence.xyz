@@ -1,18 +1,18 @@
 ---
-import BlogPostList from "../components/BlogPostList.astro";
+import ArticleList from "../components/ArticleList.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import NavTags from "../components/NavTags.astro";
-import { getBlogPosts } from "./_util.astro";
+import { getArticles } from "./_util.astro";
 import PageHeading from "../components/PageHeading.astro";
 
-const posts = await getBlogPosts()
+const posts = await getArticles()
 const recentPosts = posts.slice(0, 4)
 ---
 <BaseLayout
 	title="Index"
 >
 	<PageHeading>Recent blog posts</PageHeading>
-	<BlogPostList posts={recentPosts} postHeadingLevel={2} />
+	<ArticleList posts={recentPosts} postHeadingLevel={2} />
 	<div slot="sidebar-left" class="sidebar-item">
 		<NavTags/>
 	</div>

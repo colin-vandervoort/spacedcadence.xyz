@@ -1,6 +1,5 @@
 ---
 import { CollectionEntry, getCollection } from "astro:content";
-import { SITE_TITLE } from "../config"
 
 export interface TagInfo {
 	slug: string;
@@ -12,8 +11,8 @@ export interface NavItem {
 	href: string;
 }
 
-export async function getBlogPosts(): Promise<Array<CollectionEntry<'blog'>>> {
-	const allPosts = await getCollection('blog')
+export async function getArticles(): Promise<Array<CollectionEntry<'article'>>> {
+	const allPosts = await getCollection('article')
 	const filtered = allPosts
 		.filter(post => {
 			if (import.meta.env.PROD && post.data.draft) {
@@ -27,7 +26,7 @@ export async function getBlogPosts(): Promise<Array<CollectionEntry<'blog'>>> {
 }
 
 export async function getAllTags(): Promise<Array<TagInfo>> {
-	const posts = await getBlogPosts()
+	const posts = await getArticles()
 	const tagMap = new Map()
 
 	for (const p of posts) {
@@ -50,10 +49,10 @@ export async function getAllTags(): Promise<Array<TagInfo>> {
 	return tagInfoArr
 }
 
-export async function getRelatedBlogPosts(postId: string, tagArr: Array<string>): Promise<Array<CollectionEntry<'blog'>>> {
+export async function getRelatedArticles(postId: string, tagArr: Array<string>): Promise<Array<CollectionEntry<'article'>>> {
 	const targetTagSet = new Set(tagArr)
 
-	const posts = await getBlogPosts()
+	const posts = await getArticles()
 	const filtered = posts
 		.filter(p => {
 			if (p.id === postId) {

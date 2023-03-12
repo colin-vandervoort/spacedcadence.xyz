@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import BlogPostList from "../../../components/BlogPostList.astro";
-import { getAllTags, getBlogPosts } from "../../_util.astro";
+import ArticleList from "../../../components/ArticleList.astro";
+import { getAllTags, getArticles } from "../../_util.astro";
 import NavTags from "../../../components/NavTags.astro";
 import NavPagination from "../../../components/NavPagination.astro";
 import PageHeading from "../../../components/PageHeading.astro";
@@ -9,7 +9,7 @@ import PageHeading from "../../../components/PageHeading.astro";
 
 export async function getStaticPaths({ paginate }) {
 	const tagInfoArr = await getAllTags();
-	const blogPosts = await getBlogPosts();
+	const blogPosts = await getArticles();
 	return tagInfoArr.map((tagInfo) => {
 		const filteredPosts = blogPosts.filter((post) => post.data.tags.includes(tagInfo.slug));
 		return paginate(filteredPosts, {
@@ -29,8 +29,8 @@ const title = `Posts tagged: ${slug}`;
 
 <BaseLayout title={title}>
 	<PageHeading>{title}</PageHeading>
-	<BlogPostList posts={ page.data } postHeadingLevel={2} />
-	<NavPagination page={ page } archiveBase={ `/tag/${ slug }` }/>
+	<ArticleList posts={ page.data } postHeadingLevel={2} />
+	<NavPagination page={ page } archiveBase={ `/tags/${ slug }` }/>
 	<div slot="sidebar-left" class="sidebar-item">
 		<NavTags />
 	</div>

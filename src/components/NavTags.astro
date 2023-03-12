@@ -6,7 +6,7 @@ const tagInfoArr = await getAllTags();
 const navItems = tagInfoArr.map(tagInfo => {
 	return {
 		text: tagInfo.slug,
-		href: `/tag/${ tagInfo.slug }/1/`,
+		href: `/tags/${ tagInfo.slug }/1/`,
 		extra: `(${ tagInfo.count })`
 	}
 })
