@@ -138,6 +138,10 @@
 		flex-flow: column nowrap;
 	}
 
+	.sidebar-item ul {
+		max-height: calc(var(--sidebar-height) - 2.0rem);
+	}
+
 	._gradient-hr {
 		@apply block h-1 bg-gradient-to-r from-zinc-500 via-zinc-400 to-zinc-300;
 	}
