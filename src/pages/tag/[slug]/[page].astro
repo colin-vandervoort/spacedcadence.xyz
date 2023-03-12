@@ -30,9 +30,7 @@ const title = `Posts tagged: ${slug}`;
 <BaseLayout title={title}>
 	<PageHeading>{title}</PageHeading>
 	<BlogPostList posts={ page.data } postHeadingLevel={2} />
-	{ ( page.lastPage !== 1 ) && (
-		<NavPagination page={ page } archiveBase={ `/tag/${ slug }` }/>
-	) }
+	<NavPagination page={ page } archiveBase={ `/tag/${ slug }` }/>
 	<div slot="sidebar-left" class="sidebar-item">
 		<NavTags />
 	</div>

@@ -6,9 +6,9 @@ export interface Props {
 
 const { title, items } = Astro.props
 ---
-<nav class="grid grid-">
+<nav class="grid grid-rows-[auto_1fr]">
 	<h2 class="mt-0 mb-2 font-heading font-medium text-lg">{ title }</h2>
-	<ul class="flex flex-col flex-nowrap py-2 overflow-y-auto list-diamond">
+	<ul class="flex flex-col flex-nowrap py-2 pl-4 overflow-y-auto list-diamond">
 		{ items.map(e => (
 			<li class="py-1">
 				<a href={ e.href }>{ e.text }</a>

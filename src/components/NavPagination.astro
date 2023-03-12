@@ -9,6 +9,10 @@ export interface Props {
 
 const { page, archiveBase } = Astro.props
 
+if (page.lastPage === 1) {
+	return;
+}
+
 const windowStartIdx = Math.max(1, page.currentPage - 2)
 const windowEndIdx = Math.min(page.lastPage, page.currentPage + 2)
 const numericLinkIndices = _.range(windowStartIdx, windowEndIdx + 1)

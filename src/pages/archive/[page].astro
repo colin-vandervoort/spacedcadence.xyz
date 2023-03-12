@@ -21,9 +21,7 @@ const title = 'Archive';
 <BaseLayout title={title}>
 	<PageHeading>{title}</PageHeading>
 	<BlogPostList posts={page.data} postHeadingLevel={2} />
-	{ (page.lastPage !== 1) && (
-		<NavPagination page={ page } archiveBase={ '/archive' }/>
-	) }
+	<NavPagination page={ page } archiveBase={ '/archive' }/>
 	<div slot="sidebar-left" class="sidebar-item">
 		<NavTags />
 	</div>
