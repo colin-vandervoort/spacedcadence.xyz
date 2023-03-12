@@ -48,6 +48,9 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: StaticSitePublish
 
+      - name: Print AWS identity
+        run: aws sts get-caller-identity
+
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
