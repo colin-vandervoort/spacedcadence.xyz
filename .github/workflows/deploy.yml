@@ -12,9 +12,6 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: website
     steps:
       - uses: actions/checkout@v3
 
@@ -24,9 +21,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./website
 
       - name: Static site generation
         run: npm run build
+        working-directory: ./website
         env:
           SITE_URL: https://test.spacedcadence.xyz
 
@@ -34,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: web-files
-          path: dist
+          path: website/dist
 
   deploy:
     runs-on: ubuntu-latest
