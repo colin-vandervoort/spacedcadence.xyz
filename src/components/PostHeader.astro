@@ -9,14 +9,12 @@ export interface Props {
 
 const { pubDate, tags } = Astro.props
 ---
-<header class="mt-2 mb-3">
-	{ (pubDate || Array.isArray(tags)) && (
-		<div class="flex flex-row flex-wrap items-center gap-x-3 gap-y-2 mb-2">
-			<span class="post-date">
-				<Time datetime={ pubDate }/>
-			</span>
-			<PostTags tags={ tags }/>
-		</div>
-	) }
-	<slot name="heading" />
+<header class="mt-2 mb-2">
+	<div class="mb-1">
+		<Time datetime={ pubDate }/>
+	</div>
+	<div class="mb-1">
+		<slot name="heading" />
+	</div>
+	<PostTags tags={ tags }/>
 </header>

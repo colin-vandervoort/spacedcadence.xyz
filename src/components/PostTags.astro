@@ -7,7 +7,7 @@ export interface Props {
 
 const { tags } = Astro.props
 ---
-<div class="flex flex-wrap items-center gap-x-1">
+<div class="flex flex-wrap items-center gap-x-1 text-sm">
 	{ tags
 		.map((tag) => (
 			<a class="text-turq/90" href={`/tag/${ tag }/1/`}>{ tag }</a>

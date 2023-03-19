@@ -73,16 +73,16 @@
 	}
 
 	h1 {
-		@apply text-4xl text-zinc-700;
-	}
-	h2 {
 		@apply text-3xl text-zinc-700;
 	}
-	h3 {
+	h2 {
 		@apply text-2xl text-zinc-700;
 	}
+	h3 {
+		@apply text-lg text-zinc-700;
+	}
 	h4 {
-		@apply text-xl text-zinc-700;
+		@apply text-lg text-zinc-700;
 	}
 	h5 {
 		@apply text-lg text-zinc-700;
@@ -200,16 +200,10 @@
 	}
 
 	aside :is(h2, a, span),
-	.post-date {
+	time {
 		@apply text-zinc-600;
 	}
 
-	@media (prefers-contrast: more) {
-		aside :is(h2, a, span),
-		.post-date {
-			@apply text-zinc-800;
-		}
-	}
 }
 
 .page-header {
@@ -236,6 +230,14 @@
 
 .page-footer {
 	grid-area: footer;
+}
+
+@media (prefers-contrast: more) {
+	aside :is(h2, a, span),
+	time,
+	p {
+		@apply text-zinc-800;
+	}
 }
 
 @media (prefers-reduced-motion) {
