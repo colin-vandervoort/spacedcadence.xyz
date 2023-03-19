@@ -1,4 +1,4 @@
-name: Publish web files to S3
+name: Publish website files to S3
 
 on:
   push:
@@ -11,6 +11,8 @@ defaults:
 
 jobs:
   build:
+    defaults:
+      working-directory: website
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -55,10 +57,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: web-files
-          path: dist
+          path: website/dist
 
       - name: Upload web files to S3
-        run: scripts/sync.sh
+        run: bin/sync-static.sh
         env:
           TARGET_ENV: test
           S3_PATH: s3://colin-personal-dev-site-test-primary/www

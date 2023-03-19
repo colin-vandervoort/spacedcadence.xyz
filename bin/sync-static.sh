@@ -2,7 +2,7 @@
 set -e
 
 script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-build_dir="$script_dir"/../dist
+build_dir="$script_dir"/../website/dist
 if [ ! -d "$build_dir" ]; then
 	echo -n "Error: $build_dir directory does not exist"
 	exit 1
