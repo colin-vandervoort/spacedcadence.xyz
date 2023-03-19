@@ -6,7 +6,6 @@ import NavTags from "../../../components/NavTags.astro";
 import NavPagination from "../../../components/NavPagination.astro";
 import PageHeading from "../../../components/PageHeading.astro";
 
-
 export async function getStaticPaths({ paginate }) {
 	const tagInfoArr = await getAllTags();
 	const blogPosts = await getArticles();
