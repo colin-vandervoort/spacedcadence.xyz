@@ -16,7 +16,8 @@ import {
 } from 'cdk-nag';
 
 export interface SiteStackProps extends cdk.StackProps {
-  hostname: string;
+  primaryDomain: string;
+  alternateDomains: Array<string>;
   primaryBucketName: string;
   secondaryBucketName: string;
   removalPolicy?: cdk.RemovalPolicy,
@@ -70,20 +71,14 @@ export class SiteStack extends cdk.Stack {
       ...commonBucketProps,
       bucketName: props.primaryBucketName,
       serverAccessLogsBucket: this.secondaryBucket,
-      serverAccessLogsPrefix: 'log/primary-bucket/access/',
+      serverAccessLogsPrefix: 'log/bucket-primary/access/',
     });
 
     this.certificate = new acm.Certificate(this, 'Certificate', {
-      domainName: props.hostname,
+      domainName: props.primaryDomain,
       validation: acm.CertificateValidation.fromDns(zone),
     })
 
-    const prettyUrlFunction = new cloudfront.Function(this, 'ViewerRequestFunction', {
-      functionName: 'RedirectsAndRewrites',
-      code: cloudfront.FunctionCode.fromFile({
-        filePath: path.join(__dirname, 'viewer-request.js'),
-      }),
-    })
 
     this.distribution = new cloudfront.Distribution(this, 'CloudfrontDistribution', {
       defaultBehavior: {
@@ -93,13 +88,19 @@ export class SiteStack extends cdk.Stack {
         allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         functionAssociations: [{
-          function: prettyUrlFunction,
+          function: new cloudfront.Function(this, 'ViewerRequestFunction', {
+            functionName: 'RedirectAndRewriteFunction',
+            comment: 'Enable pretty webpage links and redirect users from invalid locations',
+            code: cloudfront.FunctionCode.fromFile({
+              filePath: path.join(__dirname, 'viewer-request.js'),
+            }),
+          }),
           eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
         }],
         edgeLambdas: [],
       },
       domainNames: [
-        props.hostname,
+        props.primaryDomain,
       ],
       errorResponses: [
         {
@@ -130,15 +131,26 @@ export class SiteStack extends cdk.Stack {
 
     const commonRecordProps: Pick<route53.RecordSetProps, 'zone' | 'recordName' | 'target'> = {
       zone,
-      recordName: props.hostname,
       target: route53.RecordTarget.fromAlias(cloudfrontAlias),
     }
     new route53.ARecord(this, 'DnsRecordA', {
       ...commonRecordProps,
+      recordName: props.primaryDomain,
     })
     new route53.AaaaRecord(this, 'DnsRecordAaaa', {
       ...commonRecordProps,
+      recordName: props.primaryDomain,
     })
+    for (const d of props.alternateDomains) {
+      new route53.ARecord(this, `DnsRecordA-${ d }`, {
+        ...commonRecordProps,
+        recordName: d,
+      })
+      new route53.AaaaRecord(this, `DnsRecordAaaa-${ d }`, {
+        ...commonRecordProps,
+        recordName: d,
+      })
+    }
   }
 }
 
@@ -151,7 +163,8 @@ export const bucketNameBase = 'colin-personal-dev-site';
 
 export const liveProps = {
   env: env,
-  hostname: 'spacedcadence.xyz',
+  primaryDomain: 'spacedcadence.xyz',
+  alternateDomains: ['www.spacedcadence.xyz'],
   primaryBucketName: `${ bucketNameBase }-live-primary`,
   secondaryBucketName: `${ bucketNameBase }-live-secondary`,
 }
@@ -161,19 +174,12 @@ const app = new cdk.App();
 
 new SiteStack(app, 'SpacedcadenceTest', {
   env: env,
-  hostname: 'test.spacedcadence.xyz',
+  primaryDomain: 'test.spacedcadence.xyz',
+  alternateDomains: ['www.test.spacedcadence.xyz'],
   primaryBucketName: `${ bucketNameBase }-test-primary`,
   secondaryBucketName: `${ bucketNameBase }-test-secondary`,
   removalPolicy: cdk.RemovalPolicy.DESTROY,
 });
-// new s3Deploy.BucketDeployment(testStack, 'TestHtml', {
-//   sources: [
-//     s3Deploy.Source.asset(path.join(__dirname, '..', 'test', 'www')),
-//   ],
-//   destinationBucket: testStack.primaryBucket,
-//   destinationKeyPrefix: 'www/',
-//   retainOnDelete: false,
-// });
 
 // new SiteStack(app, 'SpacedcadenceLive', liveProps);
 

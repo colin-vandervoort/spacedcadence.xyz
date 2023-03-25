@@ -1,7 +1,7 @@
 {
 	"recommendations": [
-		"bradlc.vscode-tailwindcss",
 		"astro-build.astro-vscode",
+		"bradlc.vscode-tailwindcss",
 		"editorconfig.editorconfig"
 	]
 }
