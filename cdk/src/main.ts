@@ -14,6 +14,7 @@ import {
   // AwsSolutionsChecks,
   NagSuppressions
 } from 'cdk-nag';
+import { Duration } from 'aws-cdk-lib';
 
 export interface SiteStackProps extends cdk.StackProps {
   primaryDomain: string;
@@ -76,9 +77,62 @@ export class SiteStack extends cdk.Stack {
 
     this.certificate = new acm.Certificate(this, 'Certificate', {
       domainName: props.primaryDomain,
+      subjectAlternativeNames: props.alternateDomains,
       validation: acm.CertificateValidation.fromDns(zone),
     })
 
+    const domainNames = [
+      props.primaryDomain,
+      ...props.alternateDomains
+    ];
+
+    const cspDirectives = [
+      `default-src ${ domainNames.join(' ') }`,
+    ];
+
+    const permissionsPolicies = [
+      'camera=()',
+      'display-capture=()',
+      'fullscreen=()',
+      'geolocation=()',
+      'microphone=()',
+    ];
+
+    const responseHeadersPolicy = new cloudfront.ResponseHeadersPolicy(this, 'ResponseHadersPolicy', {
+      responseHeadersPolicyName: 'SpacedcadenceResponseHeaders',
+      securityHeadersBehavior: {
+        contentSecurityPolicy: {
+          contentSecurityPolicy: cspDirectives.join('; '),
+          override: true,
+        },
+        contentTypeOptions: {
+          override: true,
+        },
+        frameOptions: {
+          frameOption: cloudfront.HeadersFrameOption.DENY,
+          override: true,
+        },
+        referrerPolicy: {
+          referrerPolicy: cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
+          override: true,
+        },
+        strictTransportSecurity: {
+          accessControlMaxAge: Duration.seconds(63_072_000),
+          includeSubdomains: true,
+          preload: true,
+          override: true,
+        },
+      },
+      customHeadersBehavior: {
+        customHeaders: [
+          {
+            header: 'Permissions-Policy',
+            value: permissionsPolicies.join(', '),
+            override: true,
+          },
+        ],
+      },
+    });
 
     this.distribution = new cloudfront.Distribution(this, 'CloudfrontDistribution', {
       defaultBehavior: {
@@ -87,21 +141,32 @@ export class SiteStack extends cdk.Stack {
         }),
         allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-        functionAssociations: [{
-          function: new cloudfront.Function(this, 'ViewerRequestFunction', {
-            functionName: 'RedirectAndRewriteFunction',
-            comment: 'Enable pretty webpage links and redirect users from invalid locations',
-            code: cloudfront.FunctionCode.fromFile({
-              filePath: path.join(__dirname, 'viewer-request.js'),
+        responseHeadersPolicy: responseHeadersPolicy,
+        functionAssociations: [
+          {
+            function: new cloudfront.Function(this, 'ViewerRequestFunction', {
+              functionName: 'RedirectAndRewriteFunction',
+              comment: 'Enable pretty webpage links and redirect users from invalid locations',
+              code: cloudfront.FunctionCode.fromFile({
+                filePath: path.join(__dirname, 'viewer-request.js'),
+              }),
             }),
-          }),
-          eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
-        }],
+            eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+          },
+          {
+            function: new cloudfront.Function(this, 'ViewerResponseFunction', {
+              functionName: 'CacheControlFunction',
+              comment: 'Set Cache-Control header based on Content-Type',
+              code: cloudfront.FunctionCode.fromFile({
+                filePath: path.join(__dirname, 'viewer-response.js'),
+              }),
+            }),
+            eventType: cloudfront.FunctionEventType.VIEWER_RESPONSE,
+          }
+        ],
         edgeLambdas: [],
       },
-      domainNames: [
-        props.primaryDomain,
-      ],
+      domainNames: domainNames,
       errorResponses: [
         {
           httpStatus: 403,
