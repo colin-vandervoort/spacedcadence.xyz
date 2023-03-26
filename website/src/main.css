@@ -116,7 +116,7 @@
 	}
 
 	a {
-		@apply no-underline text-teal-700 py-1;
+		@apply no-underline text-teal-700 py-2;
 	}
 
 	a:is(:hover, :focus) {
