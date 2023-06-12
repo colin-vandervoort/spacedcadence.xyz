@@ -17,6 +17,7 @@
 	font-weight: 100 900;
 	font-stretch: 62.5% 100%;
 	font-display: swap;
+	unicode-range: U+00-52F, U+1E00-1FFF, U+2200-22FF;
 }
 
 @font-face {
