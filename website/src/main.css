@@ -165,6 +165,10 @@
 		@apply no-underline outline-zinc-400 outline outline-1 outline-offset-2;
 	}
 
+	._bio-portrait-wrap img {
+		@apply rounded-full;
+	}
+
 	p > code {
 		@apply px-2 font-medium bg-zinc-200;
 	}

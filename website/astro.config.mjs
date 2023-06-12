@@ -11,46 +11,34 @@ import rehypeKatex from "rehype-katex";
 
 // https://astro.build/config
 import tailwind from "@astrojs/tailwind";
+import image from "@astrojs/image";
+const siteUrl = process.env.SITE_URL ?? 'https://spacedcadence.xyz';
 
-const siteUrl = process.env.SITE_URL ?? 'https://spacedcadence.xyz'
+// https://astro.build/config
 
 // https://astro.build/config
 export default defineConfig({
   site: siteUrl,
-  integrations: [
-    mdx(),
-    sitemap(),
-    react(),
-    tailwind({
-      config: {
-        applyBaseStyles: false,
-      },
-    })
-  ],
+  integrations: [mdx(), sitemap(), react(), tailwind({
+    config: {
+      applyBaseStyles: false
+    }
+  }), image()],
   markdown: {
-    remarkPlugins: [
-      a11yEmoji,
-      // codeImport,
-      remarkMath
-    ],
-    rehypePlugins: [
-      rehypeKatex
-    ],
+    remarkPlugins: [a11yEmoji,
+    // codeImport,
+    remarkMath],
+    rehypePlugins: [rehypeKatex],
     shikiConfig: {
       theme: 'github-light'
     },
     extendDefaultPlugins: true
   },
   vite: {
-    plugins: [
-      autoprefixer,
-      cssnano
-    ],
+    plugins: [autoprefixer, cssnano],
     server: {
       fs: {
-        allow: [
-          '.',
-        ]
+        allow: ['.']
       }
     }
   }
