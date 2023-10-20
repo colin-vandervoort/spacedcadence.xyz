@@ -1,6 +1,7 @@
 ---
 import { CollectionEntry } from 'astro:content'
 import PostHeader from './PostHeader.astro'
+import PostTags from './PostTags.astro'
 
 interface Props {
 	posts: Array<CollectionEntry<'article'>>
@@ -21,7 +22,6 @@ const HeadingTag = `h${postHeadingLevel}`
 				<article>
 					<PostHeader
 						pubDate={ post.data.pubDate }
-						tags={ post.data.tags }
 					>
 						<HeadingTag slot="heading">
 							<span class="text-xl font-heading font-medium">
@@ -32,6 +32,7 @@ const HeadingTag = `h${postHeadingLevel}`
 					{ post.data.description && (
 						<p class="post-desc">{ post.data.description }</p>
 					) }
+					<PostTags tags={ post.data.tags } />
 				</article>
 			</li>
 		))

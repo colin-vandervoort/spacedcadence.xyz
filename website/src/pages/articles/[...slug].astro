@@ -8,6 +8,7 @@ import PostHeader from "../../components/PostHeader.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 import { getArticles, getRelatedArticles, NavItem } from "../_util.astro";
+import PostTags from "../../components/PostTags.astro";
 
 export async function getStaticPaths() {
 	const blogPosts = await getArticles()
@@ -46,10 +47,10 @@ if (entry.data.katex) {
 	<article slot="default" class="single">
 		<PostHeader
 			pubDate={ entry.data.pubDate }
-			tags={ entry.data.tags }
 		>
 			<PageHeading slot="heading">{ entry.data.title }</PageHeading>
 		</PostHeader>
+		<PostTags tags={ entry.data.tags } />
 		<Content/>
 	</article>
 	{ relatedNavItems.length ? (
