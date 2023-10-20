@@ -27,28 +27,30 @@ const pageDescription = description ?? SITE_DESCRIPTION
 		<title set:html={ pageTitle }></title>
 	</head>
 	<body class="">
-		<a
-			class="_nav-skip-link block box-content fixed rounded-t-none"
-			href="#main-content"
-		>Skip to main content</a>
-		<SiteHeader>
-		</SiteHeader>
-		<main id="main-content" class="mb-2">
-			<slot />
-		</main>
-		<SiteFooter>
-			<a href="#" slot="util-links">
-				<span aria-hidden="true">▲&nbsp;</span>Back to top
-			</a>
-		</SiteFooter>
-		<div class="sidebar sidebar-left">
-			<div class="sidebar-inner">
-				<slot name="sidebar-left"/>
+		<div class="root__container">
+			<a
+				class="_nav-skip-link block box-content fixed rounded-t-none"
+				href="#main-content"
+			>Skip to main content</a>
+			<SiteHeader>
+			</SiteHeader>
+			<main id="main-content" class="mb-2">
+				<slot />
+			</main>
+			<SiteFooter>
+				<a href="#" slot="util-links">
+					<span aria-hidden="true">▲&nbsp;</span>Back to top
+				</a>
+			</SiteFooter>
+			<div class="sidebar sidebar-left">
+				<div class="sidebar-inner">
+					<slot name="sidebar-left"/>
+				</div>
 			</div>
-		</div>
-		<div class="sidebar sidebar-right">
-			<div class="sidebar-inner">
-				<slot name="sidebar-right"/>
+			<div class="sidebar sidebar-right">
+				<div class="sidebar-inner">
+					<slot name="sidebar-right"/>
+				</div>
 			</div>
 		</div>
 	</body>
