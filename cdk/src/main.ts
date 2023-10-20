@@ -6,22 +6,37 @@ import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as s3 from 'aws-cdk-lib/aws-s3';
-// import * as s3Deploy from 'aws-cdk-lib/aws-s3-deployment';
 
 import path from 'node:path';
 import { Construct } from 'constructs';
 import {
-  // AwsSolutionsChecks,
+  AwsSolutionsChecks,
   NagSuppressions
 } from 'cdk-nag';
 import { Duration } from 'aws-cdk-lib';
 
+const SECONDS_IN_YEAR = 31_536_000;
+
+export interface SupportStackProps extends cdk.StackProps {
+  zoneDomainName: string;
+}
+
+export class SupportStack extends cdk.Stack {
+
+  constructor(scope: Construct, id: string, props: SupportStackProps) {
+    super(scope, id, props);
+
+    // TODO: DNSSEC
+  }
+}
+
 export interface SiteStackProps extends cdk.StackProps {
-  primaryDomain: string;
-  alternateDomains: Array<string>;
-  primaryBucketName: string;
-  secondaryBucketName: string;
-  removalPolicy?: cdk.RemovalPolicy,
+  readonly primaryDomain: string;
+  readonly alternateDomains: Array<string>;
+  readonly primaryBucketName: string;
+  readonly secondaryBucketName: string;
+  readonly removalPolicy?: cdk.RemovalPolicy,
+  readonly extraHeaders?: Array<cloudfront.ResponseCustomHeader>;
 }
 
 export class SiteStack extends cdk.Stack {
@@ -36,9 +51,16 @@ export class SiteStack extends cdk.Stack {
 
     const removalPolicy = props.removalPolicy ?? cdk.RemovalPolicy.RETAIN;
 
+    const domainNames = [
+      props.primaryDomain,
+      ...props.alternateDomains
+    ];
+
     const zone = route53.HostedZone.fromLookup(this, 'SpacedcadenceZone', {
       domainName: 'spacedcadence.xyz',
     })
+
+    // Object storage and logging
 
     const commonBucketProps: Partial<s3.BucketProps> = {
       removalPolicy,
@@ -81,13 +103,12 @@ export class SiteStack extends cdk.Stack {
       validation: acm.CertificateValidation.fromDns(zone),
     })
 
-    const domainNames = [
-      props.primaryDomain,
-      ...props.alternateDomains
-    ];
+    // Cloudfront
 
     const cspDirectives = [
       `default-src ${ domainNames.join(' ') }`,
+      `font-src ${ domainNames.join(' ') } data:`,
+      `style-src ${ domainNames.join(' ') } \'unsafe-inline\'`,
     ];
 
     const permissionsPolicies = [
@@ -97,6 +118,17 @@ export class SiteStack extends cdk.Stack {
       'geolocation=()',
       'microphone=()',
     ];
+
+    const customHeaders = [
+      {
+        header: 'Permissions-Policy',
+        value: permissionsPolicies.join(', '),
+        override: true,
+      },
+    ]
+    if (props.extraHeaders) {
+      customHeaders.push(...props.extraHeaders);
+    }
 
     const responseHeadersPolicy = new cloudfront.ResponseHeadersPolicy(this, 'ResponseHadersPolicy', {
       responseHeadersPolicyName: 'SpacedcadenceResponseHeaders',
@@ -117,20 +149,14 @@ export class SiteStack extends cdk.Stack {
           override: true,
         },
         strictTransportSecurity: {
-          accessControlMaxAge: Duration.seconds(63_072_000),
+          accessControlMaxAge: Duration.seconds(2 * SECONDS_IN_YEAR),
           includeSubdomains: true,
           preload: true,
           override: true,
         },
       },
       customHeadersBehavior: {
-        customHeaders: [
-          {
-            header: 'Permissions-Policy',
-            value: permissionsPolicies.join(', '),
-            override: true,
-          },
-        ],
+        customHeaders: customHeaders,
       },
     });
 
@@ -192,9 +218,10 @@ export class SiteStack extends cdk.Stack {
       },
     ])
 
-    const cloudfrontAlias = new targets.CloudFrontTarget(this.distribution);
+    // DNS
 
-    const commonRecordProps: Pick<route53.RecordSetProps, 'zone' | 'recordName' | 'target'> = {
+    const cloudfrontAlias = new targets.CloudFrontTarget(this.distribution);
+    const commonRecordProps: Pick<route53.RecordSetProps, 'zone' | 'target'> = {
       zone,
       target: route53.RecordTarget.fromAlias(cloudfrontAlias),
     }
@@ -235,7 +262,7 @@ export const liveProps = {
 }
 
 const app = new cdk.App();
-// Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }))
+cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }))
 
 new SiteStack(app, 'SpacedcadenceTest', {
   env: env,
@@ -244,6 +271,13 @@ new SiteStack(app, 'SpacedcadenceTest', {
   primaryBucketName: `${ bucketNameBase }-test-primary`,
   secondaryBucketName: `${ bucketNameBase }-test-secondary`,
   removalPolicy: cdk.RemovalPolicy.DESTROY,
+  extraHeaders: [
+    {
+      header: 'X-Robots-Tag',
+      value: 'noindex, nofollow',
+      override: true,
+    },
+  ],
 });
 
 // new SiteStack(app, 'SpacedcadenceLive', liveProps);
