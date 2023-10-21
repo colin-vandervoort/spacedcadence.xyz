@@ -8,9 +8,7 @@ import PageHeading from "../components/PageHeading.astro";
 const posts = await getArticles()
 const recentPosts = posts.slice(0, 4)
 ---
-<BaseLayout
-	title="Index"
->
+<BaseLayout title="home">
 	<PageHeading>Recent articles</PageHeading>
 	<ArticleList posts={recentPosts} postHeadingLevel={2} />
 	<div slot="sidebar-left" class="sidebar-item">

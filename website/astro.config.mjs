@@ -11,7 +11,6 @@ import rehypeKatex from "rehype-katex";
 
 // https://astro.build/config
 import tailwind from "@astrojs/tailwind";
-import image from "@astrojs/image";
 const siteUrl = process.env.SITE_URL ?? 'https://spacedcadence.xyz';
 
 // https://astro.build/config
@@ -23,11 +22,11 @@ export default defineConfig({
     config: {
       applyBaseStyles: false
     }
-  }), image()],
+  }),],
   markdown: {
     remarkPlugins: [a11yEmoji,
-    // codeImport,
-    remarkMath],
+      // codeImport,
+      remarkMath],
     rehypePlugins: [rehypeKatex],
     shikiConfig: {
       theme: 'github-light'

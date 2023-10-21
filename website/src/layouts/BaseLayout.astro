@@ -13,7 +13,7 @@ export interface Props {
 
 const { title, description } = Astro.props;
 
-const pageTitle = title ?? SITE_TITLE
+const pageTitle = title ? `${ SITE_TITLE } - ${ title }` : SITE_TITLE;
 const pageDescription = description ?? SITE_DESCRIPTION
 ---
 

@@ -27,7 +27,7 @@ const entry = await getEntryBySlug('article', slug as string) as CollectionEntry
 const { Content, headings } = await entry.render()
 
 const relatedNavItems: Array<NavItem> = await getRelatedArticles(entry.id, entry.data.tags)
-	.then(relatedPosts => relatedPosts.map(p => {
+	.then(relatedPosts => relatedPosts.flatMap(p => {
 		return {
 			text: p.data.title,
 			href: `/articles/${ p.slug }`
