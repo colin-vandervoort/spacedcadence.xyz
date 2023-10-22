@@ -2,10 +2,8 @@
 import { Image } from 'astro:assets'
 import portraitImage from '../../public/images/me.png'
 ---
-<section class="flex flex-wrap gap-x-6 gap-y-2 mt-6 mb-4">
-	<div
-		class="_bio-portrait-wrap"
-	>
+<section class="bio flex flex-wrap gap-x-6 gap-y-2 mt-6 mb-4">
+	<div class="bio__portrait-wrap">
 		<Image
 			src={portraitImage}
 			alt="Portrait of Colin with a backdrop of foliage"
@@ -13,14 +11,12 @@ import portraitImage from '../../public/images/me.png'
 			height={128}
 		/>
 	</div>
-	<div>
+	<div class="bio__text-wrap">
 		<div class="flex flex-nowrap items-center gap-2">
 			<h2 class="mb-1">Colin</h2>
 			<span class="text-zinc-600">he/him</span>
 		</div>
-		<p class="leading-7">
-			Software Engineer at SRI International<br>
-			Thanks for joining me here on the World Wide Web
-		</p>
+		<p class="leading-7">Software Engineer at SRI International</p>
+		<p class="leading-7">Thanks for joining me here on the World Wide Web</p>
 	</div>
 </section>

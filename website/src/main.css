@@ -138,7 +138,7 @@
 }
 
 @layer components {
-	.sidebar-inner {
+	.sidebar__inner {
 		position: sticky;
 		top: var(--content-top);
 		height: var(--sidebar-height);
@@ -147,15 +147,19 @@
 		flex-flow: column nowrap;
 	}
 
-	.sidebar-item ul {
+	.sidebar__item ul {
 		max-height: calc(var(--sidebar-height) - 2.0rem);
+	}
+
+	.nav-item__meta {
+		margin-left: 0.25rem;
 	}
 
 	._gradient-hr {
 		@apply block h-1 bg-gradient-to-r from-zinc-500 via-zinc-400 to-zinc-300;
 	}
 
-	._nav-skip-link {
+	.nav-skip__link {
 		--height: 1.5rem;
 		--top: calc(-1.8 * var(--height));
 
@@ -167,13 +171,13 @@
 		@apply bg-zinc-100;
 	}
 
-	._nav-skip-link:is(:focus, :focus-visible) {
+	.nav-skip__link:is(:focus, :focus-visible) {
 		transform: translateY(calc(-1 * var(--top)));
 
 		@apply no-underline outline-zinc-400 outline outline-1 outline-offset-2;
 	}
 
-	._bio-portrait-wrap img {
+	.bio__portrait-wrap img {
 		@apply rounded-full;
 	}
 
@@ -297,7 +301,7 @@
 		grid-template-areas: "content";
 	}
 
-	._nav-skip-link,
+	.nav-skip__link,
 	.page-header,
 	body > footer,
 	.sidebar {

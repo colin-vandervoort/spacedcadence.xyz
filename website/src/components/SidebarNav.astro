@@ -12,7 +12,7 @@ const { title, items } = Astro.props
 		{ items.map(e => (
 			<li class="py-1">
 				<a href={ e.href }>{ e.text }</a>
-				{ ( e.extra && <span>{ e.extra }</span>) }
+				{ ( e.extra && <span class="nav-item__meta">{ e.extra }</span>) }
 			</li>
 		) ) }
 	</ul>

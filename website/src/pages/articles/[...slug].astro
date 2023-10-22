@@ -54,12 +54,12 @@ if (entry.data.katex) {
 		<Content/>
 	</article>
 	{ relatedNavItems.length ? (
-		<aside slot="sidebar-left" class="sidebar-item">
+		<aside slot="sidebar-left" class="sidebar__item">
 			<NavRelated relatedNavItems={ relatedNavItems } />
 		</aside>
 	) : '' }
 	{ filteredHeadings.length ? (
-		<aside slot="sidebar-right" class="sidebar-item">
+		<aside slot="sidebar-right" class="sidebar__item">
 			<NavTOC headings={ filteredHeadings } />
 		</aside>
 	) : '' }

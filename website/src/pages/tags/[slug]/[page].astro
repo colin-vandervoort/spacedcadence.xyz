@@ -30,7 +30,7 @@ const title = `Posts tagged: ${slug}`;
 	<PageHeading>{title}</PageHeading>
 	<ArticleList posts={ page.data } postHeadingLevel={2} />
 	<NavPagination page={ page } archiveBase={ `/tags/${ slug }` }/>
-	<div slot="sidebar-left" class="sidebar-item">
+	<div slot="sidebar-left" class="sidebar__item">
 		<NavTags />
 	</div>
 </BaseLayout>
