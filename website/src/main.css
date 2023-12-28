@@ -3,24 +3,6 @@
 @tailwind utilities;
 
 @font-face {
-	font-family: "Lexend Deca";
-	src: local("Lexend Deca"), url("/fonts/Lexend_Deca/LexendDeca-VariableFont_wght.ttf")
-		format("truetype-variations");
-	font-weight: 100 900;
-	font-display: swap;
-}
-
-@font-face {
-	font-family: "Noto Sans Mono";
-	src: local("Noto Sans Mono"), url("/fonts/Noto_Sans_Mono/NotoSansMono-VariableFont_wdth,wght.ttf")
-		format("truetype-variations");
-	font-weight: 100 900;
-	font-stretch: 62.5% 100%;
-	font-display: swap;
-	unicode-range: U+00-52F, U+1E00-1FFF, U+2200-22FF;
-}
-
-@font-face {
 	font-family: "Orbitron";
 	src: local("Orbitron"), url("/fonts/Orbitron/Orbitron-VariableFont_wght.ttf")
 		format("truetype-variations");

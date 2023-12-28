@@ -26,16 +26,21 @@ module.exports = {
 		},
 		fontFamily: {
 			'sans': [
-				'"Lexend Deca"',
-				'sans-serif'
+				'system-ui',
+				'sans-serif',
 			],
 			'mono': [
-				'"Noto Sans Mono"',
+				'ui-monospace',
+				'"Cascadia Code"',
+				'"Source Code Pro"',
 				'Menlo',
+				'Consolas',
+				'"DejaVu Sans Mono"',
 				'monospace'
 			],
 			'heading': [
 				'"Orbitron"',
+				'system-ui',
 				'sans-serif'
 			],
 		}
