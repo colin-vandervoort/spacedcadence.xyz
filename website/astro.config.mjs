@@ -8,14 +8,10 @@ import a11yEmoji from "@fec/remark-a11y-emoji";
 // import { codeImport } from "remark-code-import";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-
-// https://astro.build/config
 import tailwind from "@astrojs/tailwind";
+
 const siteUrl = process.env.SITE_URL ?? 'https://spacedcadence.xyz';
 
-// https://astro.build/config
-
-// https://astro.build/config
 export default defineConfig({
   site: siteUrl,
   integrations: [mdx(), sitemap(), react(), tailwind({

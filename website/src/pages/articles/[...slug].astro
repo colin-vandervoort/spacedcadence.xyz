@@ -1,5 +1,5 @@
 ---
-import { CollectionEntry, getEntryBySlug } from "astro:content";
+import { type CollectionEntry, getEntry } from "astro:content";
 
 import NavRelated from "../../components/NavRelated.astro";
 import NavTOC from "../../components/NavTOC.astro";
@@ -7,7 +7,7 @@ import PageHeading from "../../components/PageHeading.astro";
 import PostHeader from "../../components/PostHeader.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-import { getArticles, getRelatedArticles, NavItem } from "../_util.astro";
+import { getArticles, getRelatedArticles, type NavItem } from "../_util.astro";
 import PostTags from "../../components/PostTags.astro";
 
 export async function getStaticPaths() {
@@ -23,7 +23,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params
 
-const entry = await getEntryBySlug('article', slug as string) as CollectionEntry<'article'>
+const entry = await getEntry('article', slug as string) as CollectionEntry<'article'>
 const { Content, headings } = await entry.render()
 
 const relatedNavItems: Array<NavItem> = await getRelatedArticles(entry.id, entry.data.tags)
