@@ -1,0 +1,67 @@
+---
+import { type CollectionEntry, getEntry } from "astro:content";
+
+import NavRelated from "../../components/NavRelated.astro";
+import NavTOC from "../../components/NavTOC.astro";
+import PageHeading from "../../components/PageHeading.astro";
+import PostHeader from "../../components/PostHeader.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+import { getArticles, getRelatedArticles, type NavItem } from "../_util.astro";
+import PostTags from "../../components/PostTags.astro";
+
+export async function getStaticPaths() {
+	const blogPosts = await getArticles()
+	return blogPosts.map((p) => {
+		return {
+			params: {
+				slug: p.slug
+			}
+		}
+	})
+}
+
+const { slug } = Astro.params
+
+const entry = await getEntry('article', slug as string) as CollectionEntry<'article'>
+const { Content, headings } = await entry.render()
+
+const relatedNavItems: Array<NavItem> = await getRelatedArticles(entry.id, entry.data.tags)
+	.then(relatedPosts => relatedPosts.flatMap(p => {
+		return {
+			text: p.data.title,
+			href: `/articles/${ p.slug }`
+		}
+	}))
+const filteredHeadings = headings.filter(h => h.depth === 2)
+
+if (entry.data.katex) {
+	await import('katex/dist/katex.css')
+}
+
+---
+<BaseLayout
+	title={ entry.data.title }
+	description={ entry.data.description }
+	canonicalUrl={ entry.data.canonicalURL }
+>
+	<article slot="default" class="single">
+		<PostHeader
+			pubDate={ entry.data.pubDate }
+		>
+			<PageHeading slot="heading">{ entry.data.title }</PageHeading>
+		</PostHeader>
+		<PostTags tags={ entry.data.tags } />
+		<Content/>
+	</article>
+	{ relatedNavItems.length ? (
+		<aside slot="sidebar-left" class="sidebar__item">
+			<NavRelated relatedNavItems={ relatedNavItems } />
+		</aside>
+	) : '' }
+	{ filteredHeadings.length ? (
+		<aside slot="sidebar-right" class="sidebar__item">
+			<NavTOC headings={ filteredHeadings } />
+		</aside>
+	) : '' }
+</BaseLayout>

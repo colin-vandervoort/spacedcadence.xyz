@@ -4,5 +4,7 @@
 	"editor.quickSuggestions": {
 		"strings": true
 	},
-	"css.validate": false
+	"css.validate": false,
+	"editor.tabSize": 4,
+	"editor.insertSpaces": false
 }

@@ -1,0 +1,51 @@
+{
+  "name": "weblog-client",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "astro": "astro",
+    "dev": "astro dev",
+    "start": "astro dev",
+		"check": "astro check",
+    "build": "astro build",
+    "preview": "astro preview",
+    "serve": "astro preview",
+    "clean": "rimraf dist"
+  },
+  "keywords": [],
+  "author": "Colin VanDervoort",
+  "license": "ISC",
+  "dependencies": {
+    "@astrojs/check": "^0.9.3",
+    "@astrojs/mdx": "^3.1.5",
+    "@astrojs/react": "^3.6.2",
+    "@astrojs/rss": "^4.0.7",
+    "@astrojs/sitemap": "^3.1.6",
+    "@astrojs/tailwind": "^5.1.0",
+    "a11y-dialog": "~7.5.2",
+    "astro": "^4.15.1",
+    "astro-icon": "^1.1.1",
+    "katex": "^0.16",
+    "lodash": "^4.17",
+    "react": "^18.3",
+    "react-dom": "^18.3",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.5.4"
+  },
+  "devDependencies": {
+    "@fec/remark-a11y-emoji": "~3.1.0",
+    "@types/lodash": "^4.17.7",
+    "@types/react": "~18.0.27",
+    "@types/react-dom": "~18.0.10",
+    "autoprefixer": "^10.4.20",
+    "cssnano": "^7.0.5",
+    "postcss": "~8.4.21",
+    "rehype-katex": "~6.0.2",
+    "remark-code-import": "^1.2.0",
+    "remark-math": "^6.0.0",
+    "remark-toc": "^9.0.0",
+    "rimraf": "^6.0.1",
+    "rollup": "~3.12.0"
+  }
+}

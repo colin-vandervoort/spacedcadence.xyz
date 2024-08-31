@@ -1,0 +1,67 @@
+---
+import { SITE_TITLE, SITE_DESCRIPTION } from '../config';
+
+import HeadCommon from '../components/HeadCommon.astro';
+import HeadSEO from '../components/HeadSEO.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+export interface Props {
+	title?: string
+	description?: string
+	canonicalUrl?: string
+}
+
+const { title, description, canonicalUrl } = Astro.props;
+
+const pageTitle = title ? `${ SITE_TITLE } - ${ title }` : SITE_TITLE;
+const pageDescription = description ?? SITE_DESCRIPTION
+---
+
+<html lang="en">
+	<head>
+		<HeadCommon />
+		<HeadSEO
+			title={ pageTitle }
+			description={ pageDescription }
+			canonicalUrl={ canonicalUrl }
+		/>
+		<title set:html={ pageTitle }></title>
+		<script>
+			import { CANONICAL_HOSTNAME } from "../config";
+
+			const currentDomain = window.location.hostname;
+			if (import.meta.env.PUBLIC_LOCAL_OR_STAGING && currentDomain !== CANONICAL_HOSTNAME) {
+				window.location.href = `https://${CANONICAL_HOSTNAME}${window.location.pathname}`;
+			}
+		</script>
+	</head>
+	<body class="">
+		<div class="root__container">
+			<a
+				class="nav-skip__link block box-content fixed rounded-t-none"
+				href="#main-content"
+			>Skip to main content</a>
+			<SiteHeader>
+			</SiteHeader>
+			<main id="main-content" class="mb-2">
+				<slot />
+			</main>
+			<SiteFooter>
+				<a href="#" slot="util-links">
+					<span aria-hidden="true">▲&nbsp;</span>Back to top
+				</a>
+			</SiteFooter>
+			<div class="sidebar sidebar-left">
+				<div class="sidebar__inner">
+					<slot name="sidebar-left"/>
+				</div>
+			</div>
+			<div class="sidebar sidebar-right">
+				<div class="sidebar__inner">
+					<slot name="sidebar-right"/>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

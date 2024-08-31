@@ -1,0 +1,14 @@
+---
+import { type NavItem } from '../pages/_util.astro';
+import SidebarNav from './SidebarNav.astro';
+
+export interface Props {
+	relatedNavItems: Array<NavItem>;
+}
+
+const { relatedNavItems } = Astro.props
+---
+<SidebarNav
+	title="Related"
+	items={ relatedNavItems }
+/>
