@@ -28,6 +28,7 @@ Initially I used [this](https://github.com/unfunco/terraform-aws-oidc-github) Te
 Here is the relevant code for my website. `secrets.AWS_ROLE_TO_ASSUME` is the ARN of the `weblog-deploy-github-action` role. You can get the ARN from Terraform or by logging into the AWS management console.
 
 ## action.yml
+
 ```yaml
 name: 'Zola to S3 Bucket'
 description: 'Build and upload a Zola site to a S3 bucket'
@@ -35,10 +36,10 @@ author: 'Colin VanDervoort'
 inputs:
   aws-role-to-assume:
     required: true
-    description: "ARN of the IAM role which the runner should assume"
+    description: 'ARN of the IAM role which the runner should assume'
   s3-bucket:
     required: true
-    description: "The S3 bucket slug"
+    description: 'The S3 bucket slug'
   zola-project-path:
     required: true
     description: "The path to the site's zola files"
@@ -68,8 +69,8 @@ runs:
       run: aws s3 sync public s3://$S3_BUCKET --delete
       env:
         S3_BUCKET: ${{ inputs.s3-bucket }}
-
 ```
+
 ## deploy-to-s3.yml
 
 ```yaml
@@ -94,10 +95,10 @@ jobs:
           aws-role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           s3-bucket: colin-vandervoort-blog-static
           zola-project-path: .
-
 ```
 
 ## Terraform config
+
 ```hcl
 data "aws_iam_policy_document" "assume_role" {
   statement {
@@ -161,6 +162,7 @@ resource "aws_iam_openid_connect_provider" "oidc_provider" {
 ```
 
 ## Resources
+
 - https://github.com/aws-actions/configure-aws-credentials
 - https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/about-security-hardening-with-openid-connect
 - https://www.youtube.com/watch?v=t18YB3xDfXI

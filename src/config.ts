@@ -4,6 +4,6 @@
 export const SITE_TITLE = '/dev/colin-v/';
 export const SITE_DESCRIPTION = 'Colin talks about computers';
 
-export const CANONICAL_HOSTNAME = 'spacedcadence.xyz'
+export const CANONICAL_HOSTNAME = 'spacedcadence.xyz';
 
-export const U_DIAMOND = "⬩";
+export const U_DIAMOND = '⬩';
